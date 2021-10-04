@@ -84,7 +84,8 @@ class ServiceConnector(object):
             raise LtiServiceException(r)
         response = r.json()
 
-        self._access_tokens[scope_key] = response['access_token']
+        # expires_at = datetime.now() + datetime.timedelta(seconds=response['expires_in'])
+        self._access_tokens[scope_key] = (response['access_token'], response['expires_in'])
         return self._access_tokens[scope_key]
 
     def encode_jwt(self, message, private_key, headers):
@@ -104,7 +105,7 @@ class ServiceConnector(object):
             case_insensitive_headers=False,  # type: bool
     ):
         # type: (...) -> _ServiceConnectorResponse
-        access_token = self.get_access_token(scopes)
+        access_token, expires_in = self.get_access_token(scopes)
         headers = {
             'Authorization': 'Bearer ' + access_token,
             'Accept': accept

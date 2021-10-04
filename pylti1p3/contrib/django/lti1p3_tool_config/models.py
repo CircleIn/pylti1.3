@@ -64,10 +64,10 @@ class LtiTool(models.Model):
                                                                   "unavailable you may paste JWKS here. "
                                                                   "Value provided by LTI 1.3 Platform"))
     tool_key = models.ForeignKey(LtiToolKey, on_delete=models.PROTECT, related_name="lti_tools")
-    deployment_ids = models.TextField(null=False, blank=False,
-                                      help_text=_("List of Deployment IDs. "
-                                                  "Example: [\"test-id-1\", \"test-id-2\", ...] "
-                                                  "Each value is provided by LTI 1.3 Platform. "))
+    # deployment_ids = models.TextField(null=False, blank=False,
+    #                                   help_text=_("List of Deployment IDs. "
+    #                                               "Example: [\"test-id-1\", \"test-id-2\", ...] "
+    #                                               "Each value is provided by LTI 1.3 Platform. "))
 
     def clean(self):
         if not self.key_set_url and not self.key_set:
@@ -84,15 +84,15 @@ class LtiTool(models.Model):
             if not key_set_valid:
                 raise ValidationError({'key_set': _('Should be a dict')})
 
-        deployment_ids_valid = False
-        try:
-            deployment_ids_data = json.loads(self.deployment_ids)
-            if isinstance(deployment_ids_data, list):
-                deployment_ids_valid = True
-        except ValueError:
-            pass
-        if not deployment_ids_valid:
-            raise ValidationError({'deployment_ids': _('Should be a list. Example: ["test-id-1", "test-id-2", ...]')})
+        # deployment_ids_valid = False
+        # try:
+        #     deployment_ids_data =self.ltideployment_set.all().values('deployment_id')
+        #     if isinstance(deployment_ids_data, list):
+        #         deployment_ids_valid = True
+        # except ValueError:
+        #     pass
+        # if not deployment_ids_valid:
+        #     raise ValidationError({'deployment_ids': _('Should be a list. Example: ["test-id-1", "test-id-2", ...]')})
 
     def to_dict(self):
         data = {
@@ -103,7 +103,8 @@ class LtiTool(models.Model):
             "auth_audience": self.auth_audience,
             "key_set_url": self.key_set_url,
             "key_set": json.loads(self.key_set) if self.key_set else None,
-            "deployment_ids": json.loads(self.deployment_ids) if self.deployment_ids else []
+            # "deployment_ids": json.loads(self.deployment_ids) if self.deployment_ids else []
+            "deployment_ids": [d['deployment_id'] for d in self.ltideployment_set.all().values('deployment_id')]
         }
         return data
 

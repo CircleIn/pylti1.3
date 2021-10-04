@@ -1,9 +1,11 @@
 import json
 
-from pylti1p3.deployment import Deployment
+# from pylti1p3.deployment import Deployment
 from pylti1p3.exception import LtiException
 from pylti1p3.registration import Registration
 from pylti1p3.tool_config.abstract import ToolConfAbstract
+import logging
+logger = logging.getLogger(__name__)
 
 
 default_app_config = 'pylti1p3.contrib.django.lti1p3_tool_config.apps.PyLTI1p3ToolConfig'
@@ -79,11 +81,18 @@ class DjangoDbToolConf(ToolConfAbstract):
 
     def find_deployment_by_params(self, iss, deployment_id, client_id, *args, **kwargs):
         lti_tool = self.get_lti_tool(iss, client_id)
-        deployment_ids = json.loads(lti_tool.deployment_ids) if lti_tool.deployment_ids else []
-        if deployment_id not in deployment_ids:
+        # deployment_ids = json.loads(lti_tool.deployment_ids) if lti_tool.deployment_ids else []
+        # if deployment_id not in deployment_ids:
+        #     return None
+        try:
+            deployment = lti_tool.ltideployment_set.get(deployment_id=deployment_id)
+        except Exception as exc:
+            logger.error(exc)
             return None
-        d = Deployment()
-        return d.set_deployment_id(deployment_id)
+
+        # d = Deployment()
+        # return d.set_deployment_id(deployment_id)
+        return deployment
 
     def get_jwks(self, iss=None, client_id=None, **kwargs):
         search_kwargs = {}
