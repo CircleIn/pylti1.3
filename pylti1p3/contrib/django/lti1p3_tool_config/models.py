@@ -4,6 +4,7 @@ import json
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
+from accounts.models import Account, LMS
 from django.utils.translation import gettext_lazy as _
 from pylti1p3.registration import Registration
 
@@ -37,6 +38,8 @@ class LtiToolKey(models.Model):
 class LtiTool(models.Model):
     title = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
+    account = models.ForeignKey(Account, blank=True, null=True, on_delete=models.CASCADE)
+    platform = models.ForeignKey(LMS, blank=True, null=True, on_delete=models.CASCADE)
     issuer = models.CharField(max_length=255,
                               help_text=_("This will usually look something like 'http://example.com'. "
                                           "Value provided by LTI 1.3 Platform"))
@@ -95,6 +98,7 @@ class LtiTool(models.Model):
         #     raise ValidationError({'deployment_ids': _('Should be a list. Example: ["test-id-1", "test-id-2", ...]')})
 
     def to_dict(self):
+        # import bpdb; bpdb.set_trace()  # noqa: E702
         data = {
             "issuer": self.issuer,
             "client_id": self.client_id,

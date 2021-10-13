@@ -32,8 +32,8 @@ class LtiToolKeyAdmin(admin.ModelAdmin):
 
 class LtiToolAdmin(admin.ModelAdmin):
     """Admin for LTI Tool"""
-    search_fields = ('title', 'issuer', 'client_id', 'auth_login_url', 'auth_token_url', 'key_set_url')
-    list_display = ('id', 'title', 'is_active', 'issuer', 'client_id')
+    search_fields = ('title', 'issuer', 'account', 'platform', 'client_id', 'auth_login_url', 'auth_token_url', 'key_set_url')
+    list_display = ('id', 'title', 'account', 'platform', 'is_active', 'issuer', 'client_id')
 
 
 admin.site.register(LtiToolKey, LtiToolKeyAdmin)
